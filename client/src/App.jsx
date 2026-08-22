@@ -20,7 +20,7 @@ import UpcomingOrders from "./pages/UpcomingOrders";
 import BookingDetails from "./pages/BookingDetails";
 import MaterialStock from "./pages/MaterialStock";
 
-const API_URL = "http://10.42.240.226:5000/api";
+const API_URL = "https://om-sai-ceters-server.onrender.com/api";
 
 /* =====================================================
    GET SAVED ADMIN
