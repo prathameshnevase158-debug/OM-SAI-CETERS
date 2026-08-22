@@ -9,20 +9,41 @@ const app = express();
 
 /* =====================================================
    CORS
-   Allow localhost + mobile/PC network
 ===================================================== */
 
-app.use(
-  cors({
-  origin: [
+const allowedOrigins = [
+  // Render production frontend
+  "https://om-sai-ceters.onrender.com",
+
+  // Local development
   "http://localhost:5173",
   "http://localhost:4173",
+
+  // Local network
   "http://10.42.240.226:4173",
 
   // Capacitor Android
   "http://localhost",
   "https://localhost",
-],
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests without Origin
+      // (Postman, Render health checks, etc.)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(
+        new Error(`CORS blocked for origin: ${origin}`)
+      );
+    },
 
     methods: [
       "GET",
@@ -32,10 +53,13 @@ app.use(
       "DELETE",
       "OPTIONS",
     ],
+
     allowedHeaders: [
       "Content-Type",
       "Authorization",
     ],
+
+    credentials: true,
   })
 );
 
@@ -60,27 +84,18 @@ app.get("/", (req, res) => {
    ADMIN ROUTES
 ===================================================== */
 
-app.use(
-  "/api/admins",
-  adminRoutes
-);
+app.use("/api/admins", adminRoutes);
 
 /* =====================================================
    BOOKING ROUTES
 ===================================================== */
 
-app.use(
-  "/api/bookings",
-  bookingRoutes
-);
+app.use("/api/bookings", bookingRoutes);
 
 /* =====================================================
    MATERIAL ROUTES
 ===================================================== */
 
-app.use(
-  "/api/materials",
-  materialRoutes
-);
+app.use("/api/materials", materialRoutes);
 
 export default app;
