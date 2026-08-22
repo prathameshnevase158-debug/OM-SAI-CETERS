@@ -122,3 +122,4 @@ model BookingItem {
   returnedQuantity Int @default(0)
   missingQuantity  Int @default(0)
 }
+
