@@ -30,11 +30,11 @@ import {
    API
 ===================================================== */
 
-const API_URL =
-  "http://10.42.240.226:5000/api/bookings";
+// const API_URL =
+//   "https://om-sai-ceters-server.onrender.com/api/bookings";
 
 const MATERIAL_API_URL =
-  "http://10.42.240.226:5000/api/materials"
+  "https://om-sai-ceters-server.onrender.com/api/materials";
 
 const ADMIN_STORAGE_KEY =
   "om_sai_selected_admin";

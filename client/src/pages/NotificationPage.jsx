@@ -15,7 +15,7 @@ import {
    API
 ===================================================== */
 
-const API_URL = "http://10.42.240.226:5000/api";
+const API_URL = "https://om-sai-ceters-server.onrender.com/api";
 
 /* =====================================================
    LOCAL STORAGE
