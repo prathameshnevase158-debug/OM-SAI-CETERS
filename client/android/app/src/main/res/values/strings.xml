@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">OM SAI CETERS</string>
+    <string name="title_activity_main">OM SAI CETERS</string>
+    <string name="package_name">com.omsaiceters.app</string>
+    <string name="custom_url_scheme">com.omsaiceters.app</string>
+</resources>

@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  PAID
+}
+
+enum BookingStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ReturnStatus {
+  PENDING
+  PARTIAL
+  COMPLETE
+}
+
+enum OrderProgress {
+  BOOKED
+  PICKED_UP
+  PARTIAL_RETURN
+  RETURNED
+}
+
+model Admin {
+  id                    Int      @id @default(autoincrement())
+  name                  String   @unique
+  whatsappKey           String   @unique
+  whatsappNumber        String?
+  whatsappPhoneNumberId String?
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  bookings         Booking[]
+  pickedUpBookings Booking[] @relation("PickedUpBookings")
+  returnedBookings Booking[] @relation("ReturnedBookings")
+}
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  mobile    String
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+}
+
+model Material {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  stock     Int      @default(0)
+  rate      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookingItems BookingItem[]
+}
+
+model Booking {
+  id            Int      @id @default(autoincrement())
+  bookingNumber String   @unique
+  bookingDate   DateTime
+  eventDate     DateTime
+
+  totalQuantity   Int @default(0)
+  totalAmount     Int @default(0)
+  advanceAmount   Int @default(0)
+  remainingAmount Int @default(0)
+
+  paymentStatus PaymentStatus @default(PENDING)
+  bookingStatus BookingStatus @default(ACTIVE)
+  returnStatus  ReturnStatus  @default(PENDING)
+  orderProgress OrderProgress @default(BOOKED)
+
+  adminId Int?
+  admin   Admin? @relation(fields: [adminId], references: [id])
+
+  pickedUpByAdminId Int?
+  pickedUpByAdmin   Admin? @relation("PickedUpBookings", fields: [pickedUpByAdminId], references: [id])
+
+  pickedUpAt DateTime?
+
+  returnByAdminId Int?
+  returnByAdmin   Admin? @relation("ReturnedBookings", fields: [returnByAdminId], references: [id])
+
+  returnedAt DateTime?
+
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  items BookingItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BookingItem {
+  id Int @id @default(autoincrement())
+
+  quantity Int
+  rate     Int
+  amount   Int
+
+  bookingId Int
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  materialId Int
+  material   Material @relation(fields: [materialId], references: [id])
+
+  returnedQuantity Int @default(0)
+  missingQuantity  Int @default(0)
+}

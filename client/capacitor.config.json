@@ -1,0 +1,8 @@
+{
+  "appId": "com.omsaiceters.app",
+  "appName": "OM SAI CETERS",
+  "webDir": "dist",
+  "server": {
+    "cleartext": true
+  }
+}
