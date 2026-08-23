@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import axios from "axios";
+const API_URL = "https://om-sai-ceters-server.onrender.com/api";
 
 import {
   ArrowLeft,
