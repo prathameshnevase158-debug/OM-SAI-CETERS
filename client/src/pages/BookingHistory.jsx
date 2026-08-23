@@ -452,10 +452,10 @@ function BookingHistory() {
     booking
   ) => {
     try {
-      const response =
-        await axios.get(
-          `${API_URL}/${booking.id}`
-        );
+  const response =
+  await axios.get(
+    `${API_URL}/bookings/${booking.id}`
+  );
 
       if (
         response.data?.success
@@ -585,8 +585,7 @@ function BookingHistory() {
 
         const response =
           await axios.patch(
-            `${API_URL}/${selectedBooking.id}/payment`,
-            {
+`${API_URL}/bookings/${selectedBooking.id}/payment`,            {
               amount,
             }
           );
@@ -678,7 +677,7 @@ function BookingHistory() {
 
         const response =
           await axios.patch(
-            `${API_URL}/${selectedBooking.id}/pickup`,
+`${API_URL}/bookings/${selectedBooking.id}/pickup`,
             {
               adminId:
                 Number(
@@ -834,7 +833,7 @@ function BookingHistory() {
 
         const response =
           await axios.patch(
-            `${API_URL}/${selectedBooking.id}/return`,
+`${API_URL}/bookings/${selectedBooking.id}/return`,
             {
               adminId:
                 Number(
@@ -905,8 +904,7 @@ function BookingHistory() {
       try {
         const response =
           await axios.delete(
-            `${API_URL}/${booking.id}`
-          );
+`${API_URL}/bookings/${booking.id}`          );
 
         if (
           response.data?.success
@@ -1434,7 +1432,7 @@ function BookingHistory() {
 
         const response =
           await axios.put(
-            `${API_URL}/${selectedBooking.id}`,
+`${API_URL}/bookings/${selectedBooking.id}`,
             payload
           );
 
