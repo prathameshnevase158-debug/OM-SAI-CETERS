@@ -18,6 +18,16 @@ console.log("DATABASE_URL exists:", !!process.env.DATABASE_URL);
       console.log("MATERIAL COUNT:", materials.length);
 console.log("MATERIAL DATA:", materials);
 
+const dbInfo = await prisma.$queryRaw`
+  SELECT
+    current_database() AS database,
+    current_user AS user,
+    current_schema() AS schema
+`;
+
+console.log("DATABASE INFO:", dbInfo);
+
+
       res.json({
         success: true,
         materials,
