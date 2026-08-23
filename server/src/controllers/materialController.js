@@ -27,7 +27,7 @@ const dbInfo = await prisma.$queryRaw`
     inet_server_port() AS port
 `;
 
-console.log("DATABASE INFO:", dbInfo);
+console.log("DATABASE INFO:", JSON.stringify(dbInfo));
 
 
       res.json({
