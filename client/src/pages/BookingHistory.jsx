@@ -197,9 +197,7 @@ function BookingHistory() {
       }
 
       const response =
-        await axios.get(
-          API_URL
-        );
+        await axios.get(`${API_URL}/bookings`)
 
       if (
         response.data?.success
