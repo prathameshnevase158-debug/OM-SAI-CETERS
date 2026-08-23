@@ -9,6 +9,9 @@ import {
   CheckCircle2,
   AlertCircle,
   Boxes,
+  Pencil,
+  Save,
+  X,
 } from "lucide-react";
 
 const API_URL = "https://om-sai-ceters-server.onrender.com/api";
@@ -17,6 +20,10 @@ function MaterialStock() {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editStock, setEditStock] = useState("");
+  const [editRate, setEditRate] = useState("");
+  const [savingId, setSavingId] = useState(null);
 
   /* =====================================================
      FETCH MATERIALS
@@ -52,6 +59,68 @@ function MaterialStock() {
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  /* =====================================================
+     UPDATE MATERIAL STOCK / RATE
+  ===================================================== */
+
+  const startEdit = (material) => {
+    setEditingId(material.id);
+    setEditStock(String(material.stock ?? 0));
+    setEditRate(String(material.rate ?? 0));
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditStock("");
+    setEditRate("");
+  };
+
+  const saveMaterial = async (materialId) => {
+    const stock = Number(editStock);
+    const rate = Number(editRate);
+
+    if (!Number.isInteger(stock) || stock < 0) {
+      alert("Stock 0 किंवा त्यापेक्षा जास्त पूर्ण संख्या असावी.");
+      return;
+    }
+
+    if (!Number.isInteger(rate) || rate < 0) {
+      alert("Rate 0 किंवा त्यापेक्षा जास्त पूर्ण संख्या असावी.");
+      return;
+    }
+
+    try {
+      setSavingId(materialId);
+
+      const response = await axios.patch(
+        `${API_URL}/materials/${materialId}`,
+        {
+          stock,
+          rate,
+        }
+      );
+
+      if (response.data?.success) {
+        await fetchMaterials(true);
+        cancelEdit();
+        alert("Stock आणि Rate successfully update झाले.");
+      } else {
+        alert(
+          response.data?.message ||
+            "Stock आणि Rate update करता आले नाही."
+        );
+      }
+    } catch (error) {
+      console.error("Material update error:", error);
+      alert(
+        error.response?.data?.message ||
+          "Stock आणि Rate update करताना error आला."
+      );
+    } finally {
+      setSavingId(null);
     }
   };
 
@@ -366,79 +435,181 @@ function MaterialStock() {
 
                     </div>
 
-                    {/* =================================================
-                        STATUS
-                    ================================================= */}
+                    {editingId === material.id ? (
 
-                    <div className="mt-3">
+                      /* =================================================
+                          EDIT STOCK / RATE
+                      ================================================= */
 
-                      {isOutOfStock ? (
+                      <div className="mt-3 space-y-2">
 
-                        <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-[9px] font-black text-red-700">
-                          Out of Stock
-                        </span>
+                        <div>
+                          <label className="text-[9px] font-semibold text-slate-500">
+                            Stock
+                          </label>
 
-                      ) : (
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={editStock}
+                            onChange={(e) =>
+                              setEditStock(e.target.value)
+                            }
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-sm font-bold text-slate-900 outline-none focus:border-slate-400"
+                          />
+                        </div>
 
-                        <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-[9px] font-black text-emerald-700">
-                          Available
-                        </span>
+                        <div>
+                          <label className="text-[9px] font-semibold text-slate-500">
+                            Rate
+                          </label>
 
-                      )}
+                          <div className="mt-1 flex items-center rounded-lg border border-slate-200 bg-white">
+                            <IndianRupee
+                              size={13}
+                              className="ml-2 text-slate-400"
+                            />
 
-                    </div>
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              value={editRate}
+                              onChange={(e) =>
+                                setEditRate(e.target.value)
+                              }
+                              className="w-full rounded-lg px-1.5 py-2 text-sm font-bold text-slate-900 outline-none"
+                            />
+                          </div>
+                        </div>
 
-                    {/* =================================================
-                        STOCK
-                    ================================================= */}
+                        <div className="grid grid-cols-2 gap-2 pt-1">
 
-                    <div className="mt-3 rounded-lg bg-slate-50 p-2.5">
+                          <button
+                            type="button"
+                            onClick={cancelEdit}
+                            disabled={savingId === material.id}
+                            className="flex min-h-10 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-2 text-[10px] font-black text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+                          >
+                            <X size={13} />
+                            Cancel
+                          </button>
 
-                      <p className="text-[9px] font-semibold text-slate-500">
-                        Available
-                      </p>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              saveMaterial(material.id)
+                            }
+                            disabled={savingId === material.id}
+                            className="flex min-h-10 items-center justify-center gap-1 rounded-lg bg-slate-900 px-2 text-[10px] font-black text-white transition hover:bg-slate-800 disabled:opacity-60"
+                          >
+                            <Save size={13} />
+                            {savingId === material.id
+                              ? "Saving..."
+                              : "Save"}
+                          </button>
 
-                      <div className="mt-0.5 flex items-end justify-between">
+                        </div>
 
-                        <p
-                          className={`text-xl font-black ${
-                            isOutOfStock
-                              ? "text-red-600"
-                              : "text-slate-900"
-                          }`}
+                      </div>
+
+                    ) : (
+
+                      /* =================================================
+                          VIEW STOCK / RATE
+                      ================================================= */
+
+                      <>
+                        {/* =================================================
+                            STATUS
+                        ================================================= */}
+
+                        <div className="mt-3">
+
+                          {isOutOfStock ? (
+
+                            <span className="inline-flex rounded-full bg-red-100 px-2 py-1 text-[9px] font-black text-red-700">
+                              Out of Stock
+                            </span>
+
+                          ) : (
+
+                            <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-[9px] font-black text-emerald-700">
+                              Available
+                            </span>
+
+                          )}
+
+                        </div>
+
+                        {/* =================================================
+                            STOCK
+                        ================================================= */}
+
+                        <div className="mt-3 rounded-lg bg-slate-50 p-2.5">
+
+                          <p className="text-[9px] font-semibold text-slate-500">
+                            Available
+                          </p>
+
+                          <div className="mt-0.5 flex items-end justify-between">
+
+                            <p
+                              className={`text-xl font-black ${
+                                isOutOfStock
+                                  ? "text-red-600"
+                                  : "text-slate-900"
+                              }`}
+                            >
+                              {stock}
+                            </p>
+
+                            <span className="pb-0.5 text-[9px] font-semibold text-slate-400">
+                              नग
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                        {/* =================================================
+                            RATE
+                        ================================================= */}
+
+                        <div className="mt-2 flex items-center justify-between">
+
+                          <div className="flex items-center gap-1 text-slate-400">
+
+                            <IndianRupee size={12} />
+
+                            <span className="text-[9px] font-semibold">
+                              Rate
+                            </span>
+
+                          </div>
+
+                          <p className="text-xs font-black text-slate-900">
+                            ₹{rate}
+                          </p>
+
+                        </div>
+
+                        {/* =================================================
+                            EDIT BUTTON
+                        ================================================= */}
+
+                        <button
+                          type="button"
+                          onClick={() => startEdit(material)}
+                          className="mt-3 flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-2 text-[10px] font-black text-slate-700 transition hover:bg-slate-50"
                         >
-                          {stock}
-                        </p>
+                          <Pencil size={13} />
+                          बदल करा
+                        </button>
+                      </>
 
-                        <span className="pb-0.5 text-[9px] font-semibold text-slate-400">
-                          नग
-                        </span>
-
-                      </div>
-
-                    </div>
-
-                    {/* =================================================
-                        RATE
-                    ================================================= */}
-
-                    <div className="mt-2 flex items-center justify-between">
-
-                      <div className="flex items-center gap-1 text-slate-400">
-
-                        <IndianRupee size={12} />
-
-                        <span className="text-[9px] font-semibold">
-                          Rate
-                        </span>
-
-                      </div>
-
-                      <p className="text-xs font-black text-slate-900">
-                        ₹{rate}
-                      </p>
-
-                    </div>
+                    )}
 
                   </div>
                 );
