@@ -637,8 +637,8 @@ function BookingHistory() {
   ===================================================== */
 
   const handlePickup =
-    async () => {
-      if (!selectedBooking) {
+    async (bookingOverride = selectedBooking) => {
+      if (!bookingOverride) {
         return;
       }
 
@@ -651,7 +651,7 @@ function BookingHistory() {
       }
 
       if (
-        selectedBooking.orderProgress !==
+        bookingOverride.orderProgress !==
         "BOOKED"
       ) {
         alert(
@@ -677,7 +677,7 @@ function BookingHistory() {
 
         const response =
           await axios.patch(
-`${API_URL}/bookings/${selectedBooking.id}/pickup`,
+`${API_URL}/bookings/${bookingOverride.id}/pickup`,
             {
               adminId:
                 Number(
@@ -689,9 +689,14 @@ function BookingHistory() {
         if (
           response.data?.success
         ) {
-          setSelectedBooking(
-            response.data.booking
-          );
+          if (
+            selectedBooking?.id ===
+            bookingOverride.id
+          ) {
+            setSelectedBooking(
+              response.data.booking
+            );
+          }
 
           await fetchBookings(
             true
@@ -958,6 +963,29 @@ function BookingHistory() {
 
   const startEdit = () => {
     if (!selectedBooking) {
+      return;
+    }
+
+    const progress =
+      selectedBooking.orderProgress ||
+      "BOOKED";
+
+    const today =
+      new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const eventDate =
+      new Date(selectedBooking.eventDate);
+    eventDate.setHours(0, 0, 0, 0);
+
+    if (
+      progress !== "BOOKED" ||
+      Number.isNaN(eventDate.getTime()) ||
+      eventDate < today
+    ) {
+      alert(
+        "फक्त Upcoming बुकिंगमध्ये बदल करता येतील."
+      );
       return;
     }
 
@@ -1830,6 +1858,9 @@ function BookingHistory() {
                       booking
                     )
                   }
+                  onPickup={() =>
+                    handlePickup(booking)
+                  }
                   onDelete={() =>
                     handleDeleteBooking(
                       booking
@@ -2064,17 +2095,29 @@ function BookingDetailsModal({
 
           <div className="flex items-center gap-1.5">
 
-            {!editMode && (
-              <button
-                type="button"
-                onClick={startEdit}
+            {!editMode &&
+              progress === "BOOKED" &&
+              (() => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const eventDate = new Date(booking.eventDate);
+                eventDate.setHours(0, 0, 0, 0);
+
+                return (
+                  !Number.isNaN(eventDate.getTime()) &&
+                  eventDate >= today && (
+                    <button
+                      type="button"
+                      onClick={startEdit}
 
                 className="flex items-center gap-1.5 rounded-lg bg-slate-900 px-2.5 py-2 text-[10px] font-bold text-white"
               >
                 <Pencil size={13} />
                 बदल करा
-              </button>
-            )}
+                    </button>
+                  )
+                );
+              })()}
 
             <button
               type="button"
@@ -3203,6 +3246,7 @@ function BookingDetailsModal({
 function BookingCard({
   booking,
   onView,
+  onPickup,
   onDelete,
   formatDate,
   paymentLabel,
@@ -3543,6 +3587,27 @@ function BookingCard({
             पूर्ण माहिती
 
           </button>
+
+          {progress === "BOOKED" && (() => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const eventDate = new Date(booking.eventDate);
+            eventDate.setHours(0, 0, 0, 0);
+
+            return (
+              !Number.isNaN(eventDate.getTime()) &&
+              eventDate >= today && (
+                <button
+                  type="button"
+                  onClick={onPickup}
+                  className="flex flex-1 items-center justify-center gap-1 rounded-md bg-blue-600 py-2 text-[10px] font-bold text-white"
+                >
+                  <Truck size={12} />
+                  साहित्य दिले
+                </button>
+              )
+            );
+          })()}
 
           <button
             type="button"
