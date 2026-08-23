@@ -22,7 +22,9 @@ const dbInfo = await prisma.$queryRaw`
   SELECT
     current_database() AS database,
     current_user AS user,
-    current_schema() AS schema
+    current_schema() AS schema,
+    inet_server_addr() AS host,
+    inet_server_port() AS port
 `;
 
 console.log("DATABASE INFO:", dbInfo);
