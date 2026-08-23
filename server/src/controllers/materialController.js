@@ -15,6 +15,9 @@ console.log("DATABASE_URL exists:", !!process.env.DATABASE_URL);
         },
       });
 
+      console.log("MATERIAL COUNT:", materials.length);
+console.log("MATERIAL DATA:", materials);
+
       res.json({
         success: true,
         materials,
