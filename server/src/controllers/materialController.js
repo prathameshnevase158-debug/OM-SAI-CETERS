@@ -6,6 +6,9 @@
 
   export const getMaterials = async (req, res) => {
     try {
+      console.log("GET MATERIALS HIT");
+console.log("DATABASE_URL exists:", !!process.env.DATABASE_URL);
+
       const materials = await prisma.material.findMany({
         orderBy: {
           id: "asc",
@@ -26,6 +29,7 @@
     }
   };
 
+  
   /* =====================================================
     CREATE MATERIAL
   ===================================================== */
