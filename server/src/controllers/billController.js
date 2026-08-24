@@ -1,4 +1,4 @@
-import PDFDocument from "pdfkit";
+﻿import PDFDocument from "pdfkit";
 import prisma from "../config/prisma.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -386,7 +386,7 @@ export const generateBookingBill =
           COLORS.orange
         );
 
-      /* ===================================================
+       /* ===================================================
          HEADER
       =================================================== */
 
@@ -422,9 +422,25 @@ export const generateBookingBill =
         )
         .fontSize(26)
         .text(
-          "OM SAI CETERS",
+          "ॐ साई केटर्स",
           LEFT,
           currentY + 38,
+          {
+            width:
+              CONTENT_WIDTH,
+            align: "center",
+          }
+        );
+
+      doc
+        .fillColor(
+          COLORS.muted
+        )
+        .fontSize(8.5)
+        .text(
+          "दादा नेवसे | 9763323155",
+          LEFT,
+          currentY + 62,
           {
             width:
               CONTENT_WIDTH,
